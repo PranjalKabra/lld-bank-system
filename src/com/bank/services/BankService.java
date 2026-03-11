@@ -7,6 +7,11 @@ public class BankService {
     public BankService(AccountRepository repository){
         this.repository = repository;
     }
+    public BankAccount createBankAccount(String accountNumber, String accountHolderName, double balance){
+        BankAccount account = new BankAccount(accountNumber, accountHolderName, balance);
+        repository.save(account);
+        return account;
+    }
     public void  deposit(String accountNumber, double amount){
         BankAccount account = repository.findByAccountNumber(accountNumber);
         if(account == null){

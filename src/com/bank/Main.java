@@ -10,9 +10,8 @@ public class Main {
         AccountRepository repository = new AccountRepository();
         BankService bankService = new BankService(repository);
 
-        BankAccount account = new BankAccount("12345", "Pranjal", 1000);
+        BankAccount account = bankService.createBankAccount("12345", "Pranjal", 1000);
 
-        repository.save(account);
         bankService.deposit(account.getAccountNumber(), 500);
         bankService.withdraw(account.getAccountNumber(), 200);
 
