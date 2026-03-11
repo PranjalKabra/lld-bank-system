@@ -13,13 +13,16 @@ public class BankService {
         this.accRepository = accRepository;
         this.transRepository = transRepository;
     }
+    private void recordTransaction(String accountNumber, TransactionType type, double amount){
+        Transaction t= new Transaction(type, amount);
+        transRepository.addTransaction(accountNumber, t);
+        return;
+    }
     public BankAccount createBankAccount(String accountHolderName, double balance){
         String accountNumber = UUID.randomUUID().toString();
         BankAccount account = new BankAccount(accountNumber, accountHolderName, balance);
         accRepository.save(account);
-        TransactionType type = TransactionType.ACCOUNT_OPENED;
-        Transaction t = new Transaction(type, balance);
-        transRepository.addTransaction(accountNumber, t);
+        recordTransaction(accountNumber, TransactionType.ACCOUNT_OPENED, balance);
         return account;
     }
     public void  deposit(String accountNumber, double amount){
@@ -33,9 +36,7 @@ public class BankService {
             throw new IllegalArgumentException("invalid deposit amount");
         }
         account.credit(amount);
-        TransactionType type = TransactionType.DEPOSIT;
-        Transaction t = new Transaction(type, amount);
-        transRepository.addTransaction(accountNumber, t);
+        recordTransaction(accountNumber, TransactionType.DEPOSIT, amount);
 
     }
     public void withdraw(String accountNumber, double amount){
@@ -53,9 +54,7 @@ public class BankService {
             throw new IllegalArgumentException("not enough balance");
         }
         account.debit(amount);
-        TransactionType type = TransactionType.WITHDRAW;
-        Transaction t = new Transaction(type, amount);
-        transRepository.addTransaction(accountNumber, t);
+        recordTransaction(accountNumber, TransactionType.WITHDRAW, amount);
     }
     public void printTransactionHistory(String accountNumber){
         List<Transaction> list = transRepository.getTransactions(accountNumber);
