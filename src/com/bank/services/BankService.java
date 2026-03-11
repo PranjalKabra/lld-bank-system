@@ -13,8 +13,8 @@ public class BankService {
         this.accRepository = accRepository;
         this.transRepository = transRepository;
     }
-    private void recordTransaction(String accountNumber, TransactionType type, double amount){
-        Transaction t= new Transaction(type, amount);
+    private void recordTransaction(String accountNumber, TransactionType type, double amount, String relatedAccountNumber){
+        Transaction t= new Transaction(type, amount, relatedAccountNumber);
         transRepository.addTransaction(accountNumber, t);
         return;
     }
@@ -22,7 +22,7 @@ public class BankService {
         String accountNumber = UUID.randomUUID().toString();
         BankAccount account = new BankAccount(accountNumber, accountHolderName, balance);
         accRepository.save(account);
-        recordTransaction(accountNumber, TransactionType.ACCOUNT_OPENED, balance);
+        recordTransaction(accountNumber, TransactionType.ACCOUNT_OPENED, balance, null);
         return account;
     }
     public void  deposit(String accountNumber, double amount){
@@ -35,7 +35,7 @@ public class BankService {
             throw new IllegalArgumentException("invalid deposit amount");
         }
         account.credit(amount);
-        recordTransaction(accountNumber, TransactionType.DEPOSIT, amount);
+        recordTransaction(accountNumber, TransactionType.DEPOSIT, amount, null);
 
     }
     public void withdraw(String accountNumber, double amount){
@@ -53,12 +53,41 @@ public class BankService {
             throw new IllegalArgumentException("not enough balance");
         }
         account.debit(amount);
-        recordTransaction(accountNumber, TransactionType.WITHDRAW, amount);
+        recordTransaction(accountNumber, TransactionType.WITHDRAW, amount, null);
+    }
+    public void transfer(String fromAccountNumber, String toAccountNumber, double amount){
+        if(amount <=0){
+            throw new IllegalArgumentException("acmount cannot be negative");
+        }
+        BankAccount from = accRepository.findByAccountNumber(fromAccountNumber);
+        BankAccount to = accRepository.findByAccountNumber(toAccountNumber);
+        if((from == null) || (to == null)){
+            throw new IllegalArgumentException("Account not found");
+        }
+        if(from.getBalance() < amount){
+            throw new IllegalArgumentException("Not enough balance to transfer this amount");
+        }
+
+        from.debit(amount);
+        to.credit(amount);
+
+        recordTransaction(fromAccountNumber, TransactionType.TRANSFER_OUT, amount, toAccountNumber);
+        recordTransaction(toAccountNumber, TransactionType.TRANSFER_IN, amount, fromAccountNumber);
+
     }
     public void printTransactionHistory(String accountNumber){
         List<Transaction> list = transRepository.getTransactions(accountNumber);
         for(Transaction  t: list){
-            System.out.println(t.getTimestamp() + " -> " + t.getType() + " :: " +  t.getAmount());
+            if(t.getType() == TransactionType.TRANSFER_IN){
+                System.out.println(t.getTimestamp() + " -> " + t.getType() + " :: " + t.getAmount() + " from " + t.getRelatedAccount());
+
+            }
+            else if(t.getType() == TransactionType.TRANSFER_OUT){
+                System.out.println(t.getTimestamp() + " -> " + t.getType() + " :: " + t.getAmount() + " to " + t.getRelatedAccount());
+            }
+            else{
+                System.out.println(t.getTimestamp() + " -> " + t.getType() + " :: " +  t.getAmount());
+            }
         }
     }
 }

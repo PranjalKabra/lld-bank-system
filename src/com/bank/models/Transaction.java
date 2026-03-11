@@ -20,5 +20,8 @@ public class Transaction {
     public LocalDateTime getTimestamp(){
         return this.timestamp;
     }
+    public String getRelatedAccount(){
+        return this.relatedAccount;
+    }
 
 }
