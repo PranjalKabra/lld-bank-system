@@ -1,13 +1,15 @@
 package com.bank.services;
 import com.bank.models.BankAccount;
 import com.bank.repository.AccountRepository;
+import java.util.UUID;
 
 public class BankService {
     private AccountRepository repository;
     public BankService(AccountRepository repository){
         this.repository = repository;
     }
-    public BankAccount createBankAccount(String accountNumber, String accountHolderName, double balance){
+    public BankAccount createBankAccount(String accountHolderName, double balance){
+        String accountNumber = UUID.randomUUID().toString();
         BankAccount account = new BankAccount(accountNumber, accountHolderName, balance);
         repository.save(account);
         return account;
