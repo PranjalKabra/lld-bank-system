@@ -5,7 +5,8 @@ public class Transaction {
     private TransactionType type;
     private double amount;
     private LocalDateTime timestamp;
-    public Transaction(TransactionType type, double amount){
+    private String relatedAccount;
+    public Transaction(TransactionType type, double amount, String relatedAccount){
         this.type = type;
         this.amount = amount;
         this.timestamp = LocalDateTime.now();
