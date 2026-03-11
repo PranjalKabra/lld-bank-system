@@ -10,6 +10,7 @@ public class Transaction {
         this.type = type;
         this.amount = amount;
         this.timestamp = LocalDateTime.now();
+        this.relatedAccount = relatedAccount;
     }
     public TransactionType getType(){
         return this.type;

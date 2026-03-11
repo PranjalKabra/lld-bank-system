@@ -18,12 +18,12 @@ public class BankService {
         transRepository.addTransaction(accountNumber, t);
         return;
     }
-    public BankAccount createBankAccount(String accountHolderName, double balance){
+    public String createBankAccount(String accountHolderName, double balance){
         String accountNumber = UUID.randomUUID().toString();
         BankAccount account = new BankAccount(accountNumber, accountHolderName, balance);
         accRepository.save(account);
         recordTransaction(accountNumber, TransactionType.ACCOUNT_OPENED, balance, null);
-        return account;
+        return accountNumber;
     }
     public void  deposit(String accountNumber, double amount){
         BankAccount account = accRepository.findByAccountNumber(accountNumber);
@@ -89,5 +89,12 @@ public class BankService {
                 System.out.println(t.getTimestamp() + " -> " + t.getType() + " :: " +  t.getAmount());
             }
         }
+    }
+    public double getBalance(String accountNumber){
+        BankAccount acc = accRepository.findByAccountNumber(accountNumber);
+        if(acc == null){
+            throw new IllegalArgumentException("Please enter a valid account number");
+        }
+        return acc.getBalance();
     }
 }

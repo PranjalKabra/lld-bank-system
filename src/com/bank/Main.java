@@ -13,13 +13,17 @@ public class Main {
 
         BankService bankService = new BankService(accountRepository, transactionRepository);
 
-        BankAccount account = bankService.createBankAccount("Pranjal", 1000);
+        String acc1 = bankService.createBankAccount("Alice",1000);
+        String acc2 = bankService.createBankAccount("Bob",500);
 
-        String accNo = account.getAccountNumber();
+        bankService.deposit(acc1,200);
 
-        bankService.deposit(accNo, 500);
-        bankService.withdraw(accNo, 200);
+        bankService.transfer(acc1,acc2,300);
 
-        bankService.printTransactionHistory(accNo);
+        System.out.println(bankService.getBalance(acc1));
+        System.out.println(bankService.getBalance(acc2));
+
+        bankService.printTransactionHistory(acc1);
+        bankService.printTransactionHistory(acc2);
     }
 }
