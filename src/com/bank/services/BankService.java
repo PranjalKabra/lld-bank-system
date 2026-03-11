@@ -28,8 +28,7 @@ public class BankService {
     public void  deposit(String accountNumber, double amount){
         BankAccount account = accRepository.findByAccountNumber(accountNumber);
         if(account == null){
-            System.out.println("Account not found");
-            return;
+            throw new IllegalArgumentException("Account not found");
         }
         if(amount <= 0) {
             System.out.println("Invalid deposit amount");
@@ -59,7 +58,7 @@ public class BankService {
     public void printTransactionHistory(String accountNumber){
         List<Transaction> list = transRepository.getTransactions(accountNumber);
         for(Transaction  t: list){
-            System.out.println(t.getType() + " :: " +  t.getAmount());
+            System.out.println(t.getTimestamp() + " -> " + t.getType() + " :: " +  t.getAmount());
         }
     }
 }
