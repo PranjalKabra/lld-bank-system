@@ -19,4 +19,10 @@ public class BankAccount {
     public double getBalance(){
         return this.balance;
     }
+    public void credit(double amount){
+        this.balance += amount;
+    }
+    public void debit(double amount){
+        this.balance -= amount;
+    }
 }
