@@ -2,16 +2,20 @@ package com.bank.services;
 import com.bank.models.BankAccount;
 import com.bank.models.Transaction;
 import com.bank.models.TransactionType;
+import com.bank.models.Customer;
 import com.bank.repository.AccountRepository;
+import com.bank.repository.CustomerRepository;
 import com.bank.repository.TransactionRepository;
 import java.util.*;
 
 public class BankService {
     private AccountRepository accRepository;
     private TransactionRepository transRepository;
-    public BankService(AccountRepository accRepository, TransactionRepository transRepository){
+    private CustomerRepository customerRepo;
+    public BankService(AccountRepository accRepository, TransactionRepository transRepository, CustomerRepository customerRepo){
         this.accRepository = accRepository;
         this.transRepository = transRepository;
+        this.customerRepo = customerRepo;
     }
     private void recordTransaction(String accountNumber, TransactionType type, double amount, String relatedAccountNumber){
         Transaction t= new Transaction(type, amount, relatedAccountNumber);
@@ -96,5 +100,22 @@ public class BankService {
             throw new IllegalArgumentException("Please enter a valid account number");
         }
         return acc.getBalance();
+    }
+    public String createCustomer(String name){
+        String customerId = UUID.randomUUID().toString();
+        Customer customer = new Customer(name, customerId);
+        this.customerRepo.save(customer);
+        return customerId;
+    }
+    public String createAccount(String customerId, double balance){
+//        System.out.println("Searching customer: " + customerId);
+        Customer customer = this.customerRepo.findById(customerId);
+
+        if(customer == null){
+            throw new IllegalArgumentException("Nope, there doesn't exist such a customer");
+        }
+        String accountNumber = createBankAccount(customer.getName(), balance);
+        customer.addAccount(accountNumber);
+        return accountNumber;
     }
 }
