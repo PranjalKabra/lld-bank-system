@@ -8,17 +8,14 @@ public class Main {
     public static void main(String[] args){
 //        System.out.print("bank system started");
         AccountRepository repository = new AccountRepository();
-        BankService bankService = new BankService();
+        BankService bankService = new BankService(repository);
 
         BankAccount account = new BankAccount("12345", "Pranjal", 1000);
 
         repository.save(account);
+        bankService.deposit(account.getAccountNumber(), 500);
+        bankService.withdraw(account.getAccountNumber(), 200);
 
-        BankAccount retrieved = repository.findByAccountNumber("12345");
-
-        bankService.deposit(retrieved, 500);
-        bankService.withdraw(retrieved, 200);
-
-        System.out.println("Final Balance: " + retrieved.getBalance());
+        System.out.println("Final Balance: " + repository.findByAccountNumber(account.getAccountNumber()).getBalance());
     }
 }
